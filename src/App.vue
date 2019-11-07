@@ -9,6 +9,7 @@
       <v-toolbar-items>
         <v-btn text router to="/">Home</v-btn>
         <v-btn text router to="/makanan">CRUD Makanan</v-btn>
+        <v-btn text router to="/minuman">CRUD Minuman</v-btn>
       </v-toolbar-items>
       <v-btn text href="https://github.com/vuetifyjs/vuetify/releases/latest" target="_blank">
         <span class="mr-2">Latest Release</span>

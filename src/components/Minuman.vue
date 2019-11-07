@@ -1,7 +1,7 @@
 <template>
   <v-data-table
     :headers="headers"
-    :items="desserts"
+    :items="minumans"
     :search="search"
     sort-by="calories"
     class="elevation-1"
@@ -18,8 +18,7 @@
           hide-details
         ></v-text-field>
         <v-spacer></v-spacer>
-
-        <template v-if="selected.length>0">
+        <template v-if="selected.length > 0">
           <v-btn
             color="red"
             dark
@@ -27,10 +26,9 @@
             @click="deleteitemBox()"
           >Delete {{selected.length}}</v-btn>
         </template>
-
         <v-dialog v-model="dialog" max-width="500px">
           <template v-slot:activator="{ on }">
-            <v-btn color="primary" dark class="mb-2" v-on="on">buat makanan</v-btn>
+            <v-btn color="primary" dark class="mb-2" v-on="on">buat minuman</v-btn>
           </template>
           <v-card>
             <v-card-title>
@@ -40,10 +38,16 @@
               <v-container>
                 <v-row>
                   <v-col cols="12" sm="6" md="4">
-                    <v-text-field v-model="editedItem.name" label="Dessert name"></v-text-field>
+                    <v-text-field v-model="editedItem.name" label="Minuman name"></v-text-field>
                   </v-col>
                   <v-col cols="12" sm="6" md="4">
-                    <v-text-field v-model="editedItem.calories" label="Calories"></v-text-field>
+                    <v-select
+                      :items="items"
+                      label="Calories (g)"
+                      v-model="editedItem.calories"
+                      outline
+                      autocomplete
+                    ></v-select>
                   </v-col>
                   <v-col cols="12" sm="6" md="4">
                     <v-text-field v-model="editedItem.fat" label="Fat (g)"></v-text-field>
@@ -67,6 +71,9 @@
       </v-toolbar>
     </template>
     <template v-slot:item.checkbox="{ item }">
+      <v-checkbox></v-checkbox>
+    </template>
+    <template v-slot:item.checkbox="{ item }">
       <v-checkbox :value="item" v-model="selected"></v-checkbox>
     </template>
     <template v-slot:item.action="{ item }">
@@ -82,13 +89,16 @@
   </v-data-table>
 </template>
 <script>
-import { dessertsRef } from "../firebase";
+import { minumansRef } from "../firebase";
 
 export default {
   data: () => ({
     selected: [],
+    items: [
+      { text: "Dingin", value: "Dingin" },
+      { text: "Hangat", value: "Hangat" }
+    ],
     cek: -1,
-    i: 0,
     dialog: false,
     search: "",
     headers: [
@@ -105,7 +115,7 @@ export default {
       { text: "#", value: "checkbox" },
       { text: "Actions", value: "action", sortable: false }
     ],
-    desserts: [],
+    minumans: [],
     editedIndex: -1,
     editedItem: {
       name: "",
@@ -123,7 +133,7 @@ export default {
     }
   }),
   firebase: {
-    desserts: dessertsRef
+    minumans: minumansRef
   },
   computed: {
     formTitle() {
@@ -151,12 +161,11 @@ export default {
       this.editedItem.carbs = 0;
       this.editedItem.protein = 0;
       this.cek = -1;
-      this.i = 0;
     },
     // methods untuk save
     save() {
       if (this.cek > -1) {
-        dessertsRef.child(this.editedIndex).set({
+        minumansRef.child(this.editedIndex).set({
           name: this.editedItem.name,
           calories: this.editedItem.calories,
           fat: this.editedItem.fat,
@@ -165,7 +174,7 @@ export default {
         });
         this.clear();
       } else {
-        dessertsRef.push({
+        minumansRef.push({
           name: this.editedItem.name,
           calories: this.editedItem.calories,
           fat: this.editedItem.fat,
@@ -185,18 +194,18 @@ export default {
     },
     deleteitem(item) {
       confirm("Are you sure you want to delete this item?") &&
-        dessertsRef.child(item[".key"]).remove();
+        minumansRef.child(item[".key"]).remove();
     },
     deleteitemBox() {
       if (this.selected.length > 0) {
-        if (this.selected.length != null && this.selected.length == 1) {
+        if (this.selected.length == 1) {
           confirm("Are you sure you want to delete this item?") &&
-            dessertsRef.child(this.selected[0][".key"]).remove();
+            minumansRef.child(this.selected[0][".key"]).remove();
           this.selected = [];
         } else {
           if (confirm("Are you sure you want to delete all this item?")) {
             for (this.i = 0; this.i < this.selected.length; this.i++) {
-              dessertsRef.child(this.selected[this.i][".key"]).remove();
+              minumansRef.child(this.selected[this.i][".key"]).remove();
             }
             this.selected = [];
           } else {
