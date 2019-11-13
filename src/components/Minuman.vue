@@ -71,10 +71,7 @@
       </v-toolbar>
     </template>
     <template v-slot:item.checkbox="{ item }">
-      <v-checkbox></v-checkbox>
-    </template>
-    <template v-slot:item.checkbox="{ item }">
-      <v-checkbox :value="item" v-model="selected"></v-checkbox>
+      <v-checkbox :value="item['.key']" v-model="selected" multiple></v-checkbox>
     </template>
     <template v-slot:item.action="{ item }">
       <v-icon @click="edititem(item)" class="mr-1">mdi-silverware</v-icon>
@@ -106,14 +103,15 @@ export default {
         text: "Dessert (100g serving)",
         align: "left",
         sortable: false,
-        value: "name"
+        value: "name",
+        selected: false
       },
-      { text: "Calories", value: "calories" },
-      { text: "Fat (g)", value: "fat" },
-      { text: "Carbs (g)", value: "carbs" },
-      { text: "Protein (g)", value: "protein" },
-      { text: "#", value: "checkbox" },
-      { text: "Actions", value: "action", sortable: false }
+      { text: "Calories", value: "calories", selected: false },
+      { text: "Fat (g)", value: "fat", selected: false },
+      { text: "Carbs (g)", value: "carbs", selected: false },
+      { text: "Protein (g)", value: "protein", selected: false },
+      { text: "#", value: "checkbox", sortable: false, selected: false },
+      { text: "Actions", value: "action", sortable: false, selected: false }
     ],
     minumans: [],
     editedIndex: -1,
@@ -195,17 +193,18 @@ export default {
     deleteitem(item) {
       confirm("Are you sure you want to delete this item?") &&
         minumansRef.child(item[".key"]).remove();
+      this.selected = [];
     },
     deleteitemBox() {
       if (this.selected.length > 0) {
         if (this.selected.length == 1) {
           confirm("Are you sure you want to delete this item?") &&
-            minumansRef.child(this.selected[0][".key"]).remove();
+            minumansRef.child(this.selected[0]).remove();
           this.selected = [];
         } else {
           if (confirm("Are you sure you want to delete all this item?")) {
             for (this.i = 0; this.i < this.selected.length; this.i++) {
-              minumansRef.child(this.selected[this.i][".key"]).remove();
+              minumansRef.child(this.selected[this.i]).remove();
             }
             this.selected = [];
           } else {

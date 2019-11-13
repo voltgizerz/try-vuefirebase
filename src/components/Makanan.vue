@@ -66,8 +66,8 @@
         </v-dialog>
       </v-toolbar>
     </template>
-    <template v-slot:item.checkbox="{ item }">
-      <v-checkbox :value="item" v-model="selected"></v-checkbox>
+    <template v-slot:item.checkbox="{ item}">
+      <v-checkbox :value="item['.key']" v-model="selected"></v-checkbox>
     </template>
     <template v-slot:item.action="{ item }">
       <v-icon @click="edititem(item)" class="mr-1">mdi-silverware</v-icon>
@@ -102,7 +102,7 @@ export default {
       { text: "Fat (g)", value: "fat" },
       { text: "Carbs (g)", value: "carbs" },
       { text: "Protein (g)", value: "protein" },
-      { text: "#", value: "checkbox" },
+      { text: "#", value: "checkbox", sortable: false },
       { text: "Actions", value: "action", sortable: false }
     ],
     desserts: [],
@@ -185,18 +185,19 @@ export default {
     },
     deleteitem(item) {
       confirm("Are you sure you want to delete this item?") &&
-        dessertsRef.child(item[".key"]).remove();
+      dessertsRef.child(item[".key"]).remove();
+      this.selected = [];
     },
     deleteitemBox() {
       if (this.selected.length > 0) {
         if (this.selected.length != null && this.selected.length == 1) {
           confirm("Are you sure you want to delete this item?") &&
-            dessertsRef.child(this.selected[0][".key"]).remove();
+            dessertsRef.child(this.selected[0]).remove();
           this.selected = [];
         } else {
           if (confirm("Are you sure you want to delete all this item?")) {
             for (this.i = 0; this.i < this.selected.length; this.i++) {
-              dessertsRef.child(this.selected[this.i][".key"]).remove();
+              dessertsRef.child(this.selected[this.i]).remove();
             }
             this.selected = [];
           } else {
